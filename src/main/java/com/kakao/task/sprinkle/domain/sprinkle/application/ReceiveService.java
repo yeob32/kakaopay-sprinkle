@@ -1,5 +1,7 @@
 package com.kakao.task.sprinkle.domain.sprinkle.application;
 
+import com.kakao.task.sprinkle.domain.chat.Chat;
+import com.kakao.task.sprinkle.domain.chat.ChatRepository;
 import com.kakao.task.sprinkle.domain.dividend.Dividend;
 import com.kakao.task.sprinkle.domain.sprinkle.Sprinkle;
 import com.kakao.task.sprinkle.domain.sprinkle.dao.SprinkleRepository;
@@ -18,14 +20,18 @@ import org.springframework.transaction.annotation.Transactional;
 public class ReceiveService {
 
     private final SprinkleRepository sprinkleRepository;
+    private final ChatRepository chatRepository;
     private final UserRepository userRepository;
 
     @Transactional
     public Dividend receive(ReceiveDto.Req req) {
+        Chat chat = chatRepository.findById(req.getRoomId())
+                .orElseThrow(() -> new DataNotFoundException(req.getRoomId(), ErrorCode.CHAT_NOT_FOUND));
         User user = userRepository.findById(req.getUserId())
                 .orElseThrow(() -> new DataNotFoundException(req.getUserId(), ErrorCode.USER_NOT_FOUND));
 
         Sprinkle sprinkle = sprinkleRepository.findByToken(req.getToken());
+        sprinkle.checkInvalidChat(chat);
         sprinkle.receiveValidator(user);
 
         Dividend usableDividend = sprinkle.getDividends().stream()

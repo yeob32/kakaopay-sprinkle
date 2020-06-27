@@ -4,7 +4,6 @@ import com.kakao.task.sprinkle.domain.chat.Chat;
 import com.kakao.task.sprinkle.domain.chat.ChatRepository;
 import com.kakao.task.sprinkle.domain.sprinkle.Sprinkle;
 import com.kakao.task.sprinkle.domain.sprinkle.application.SprinkleService;
-import com.kakao.task.sprinkle.domain.sprinkle.dao.SprinkleRepository;
 import com.kakao.task.sprinkle.domain.sprinkle.dto.SprinkleDto;
 import com.kakao.task.sprinkle.domain.user.User;
 import com.kakao.task.sprinkle.domain.user.UserRepository;

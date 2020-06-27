@@ -1,9 +1,7 @@
 package com.kakao.task.sprinkle.domain.sprinkle;
 
-import com.kakao.task.sprinkle.domain.sprinkle.exception.DuplicateReceiveException;
-import com.kakao.task.sprinkle.domain.sprinkle.exception.ExpiredMySprinkleException;
-import com.kakao.task.sprinkle.domain.sprinkle.exception.ExpiredSprinkleException;
-import com.kakao.task.sprinkle.domain.sprinkle.exception.VerifyReceiverException;
+import com.kakao.task.sprinkle.domain.chat.InvalidChatterException;
+import com.kakao.task.sprinkle.domain.sprinkle.exception.*;
 import com.kakao.task.sprinkle.global.common.TokenUtil;
 import com.kakao.task.sprinkle.domain.dividend.Dividend;
 import com.kakao.task.sprinkle.domain.chat.Chat;
@@ -68,6 +66,12 @@ public class Sprinkle {
     public void validateExpiredByRetreive() {
         if (createdAt.isBefore(LocalDateTime.now().minusDays(7))) {
             throw new ExpiredMySprinkleException(ErrorCode.RETREIVE_EXPIRED);
+        }
+    }
+
+    public void checkInvalidChat(Chat chat) {
+        if(!this.chat.equals(chat)) {
+            throw new InvalidSprinkleException(ErrorCode.INVALID_SPRINKLE);
         }
     }
 

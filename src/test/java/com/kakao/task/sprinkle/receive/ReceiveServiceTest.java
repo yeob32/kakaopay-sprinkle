@@ -11,6 +11,7 @@ import com.kakao.task.sprinkle.domain.sprinkle.dao.SprinkleRepository;
 import com.kakao.task.sprinkle.domain.sprinkle.dto.ReceiveDto;
 import com.kakao.task.sprinkle.domain.sprinkle.dto.SprinkleDto;
 import com.kakao.task.sprinkle.domain.sprinkle.exception.CloseSprinkleException;
+import com.kakao.task.sprinkle.domain.sprinkle.exception.InvalidSprinkleException;
 import com.kakao.task.sprinkle.domain.user.User;
 import com.kakao.task.sprinkle.domain.user.UserRepository;
 import org.junit.jupiter.api.*;
@@ -44,8 +45,8 @@ public class ReceiveServiceTest {
     User receiver;
     Chat chat;
 
-    final long totalAmount = 112852880123213213L;
-    final int divideCount = 241;
+    final long totalAmount = 1000;
+    final int divideCount = 2;
 
     @BeforeEach
     public void setUp() {
@@ -71,7 +72,10 @@ public class ReceiveServiceTest {
         receiveService.receive(ReceiveDto.Req.builder().token(bigSprinkle.getToken()).roomId(chat.getId()).userId(receiver.getId()).build());
 
         Chat anotherChatRoom = chatRepository.save(new Chat());
-        receiveService.receive(ReceiveDto.Req.builder().token(bigSprinkle.getToken()).roomId(anotherChatRoom.getId()).userId(receiver.getId()).build());
+        Assertions.assertThrows(InvalidSprinkleException.class,
+                () -> receiveService.receive(ReceiveDto.Req.builder()
+                        .token(bigSprinkle.getToken()).roomId(anotherChatRoom.getId()).userId(receiver.getId())
+                        .build()));
     }
 
     @Test

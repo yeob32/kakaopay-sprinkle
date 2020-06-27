@@ -12,6 +12,7 @@ public enum ErrorCode {
     RECEIVE_EXPIRED(400, "Expired Receive"),
     REQUIRED_PARAMETER(400, "Required parameter"),
     INVALID_CHATTER(401, "Invalid Chat Member"),
+    INVALID_SPRINKLE(401, "Invalid Sprinkle"),
     INVALID_INPUT_VALUE(400, "Invalid input value");
 
 
