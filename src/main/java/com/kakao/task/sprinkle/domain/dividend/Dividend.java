@@ -38,7 +38,11 @@ public class Dividend {
         this.user = user;
     }
 
-    public void allotUser(User receiver) {
+    public void allotMoney(User receiver) {
+        if(!usable()) {
+            throw new DuplicateReceiveException(ErrorCode.RECEIVE_DUPLICATION);
+        }
+
         this.user = receiver;
     }
 

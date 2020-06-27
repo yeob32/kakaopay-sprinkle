@@ -5,6 +5,7 @@ import com.kakao.task.sprinkle.domain.sprinkle.Sprinkle;
 import com.kakao.task.sprinkle.domain.sprinkle.dao.SprinkleRepository;
 import com.kakao.task.sprinkle.domain.sprinkle.dto.ReceiveDto;
 import com.kakao.task.sprinkle.domain.sprinkle.exception.CloseSprinkleException;
+import com.kakao.task.sprinkle.domain.sprinkle.exception.DataNotFoundException;
 import com.kakao.task.sprinkle.domain.user.User;
 import com.kakao.task.sprinkle.domain.user.UserRepository;
 import com.kakao.task.sprinkle.global.exception.ErrorCode;
@@ -21,17 +22,16 @@ public class ReceiveSprinkleService {
 
     @Transactional
     public Dividend receive(ReceiveDto.Req req) {
+        User user = userRepository.findById(req.getUserId()).orElseThrow(() -> new DataNotFoundException(req.getUserId(), ErrorCode.USER_NOT_FOUND));
 
         Sprinkle sprinkle = sprinkleRepository.findByToken(req.getToken());
-        sprinkle.validateExpired();
+        sprinkle.receiveValidator(user);
 
         Dividend usableDividend = sprinkle.getDividends().stream()
                 .filter(Dividend::usable)
                 .findFirst()
                 .orElseThrow(() -> new CloseSprinkleException(ErrorCode.SPRINKLE_CLOSE));
-
-        User user = userRepository.findById(req.getUserId()).orElse(null);
-        usableDividend.allotUser(user);
+        usableDividend.allotMoney(user);
 
         return usableDividend;
     }

@@ -2,7 +2,9 @@ package com.kakao.task.sprinkle.global.exception;
 
 public enum ErrorCode {
 
-    DATA_NOT_FOUND(404, "Not Found Data"),
+    USER_NOT_FOUND(404, "Not Found User"),
+    CHAT_NOT_FOUND(404, "Not Found Chat Room"),
+    SPRINKLE_NOT_FOUND(404, "Not Found Sprinkle"),
     VERIFY_RECEIVER(401, "invaild receiver"),
     SPRINKLE_CLOSE(403, "Sprinkle is Over"),
     RETREIVE_EXPIRED(403, "Expired Sprinkle"),
