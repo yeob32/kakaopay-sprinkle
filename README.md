@@ -76,7 +76,7 @@ GlobalControllerAdvice , ExceptionHandler 를 통하여 관리 집중
 
 **뿌리기 받기**
 - 요청 `POST` `/receive`
-- `token` : a1f
+- `token` : 0c1
 ```
 {
   "receivedAmount": 434
