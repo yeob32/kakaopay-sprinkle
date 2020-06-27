@@ -10,10 +10,12 @@ public class ErrorResponse {
 
     private int status;
     private String message;
+    private String description;
 
-    private ErrorResponse(ErrorCode code) {
+    private ErrorResponse(ErrorCode code, String description) {
         this.status = code.getStatus();
         this.message = code.getMessage();
+        this.description = description;
     }
 
     private ErrorResponse(ApiException e) {
@@ -23,5 +25,9 @@ public class ErrorResponse {
 
     public static ErrorResponse of(final ApiException e) {
         return new ErrorResponse(e);
+    }
+
+    public static ErrorResponse of(final ErrorCode errorCode, String description) {
+        return new ErrorResponse(errorCode, description);
     }
 }

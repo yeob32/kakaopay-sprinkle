@@ -1,6 +1,5 @@
 package com.kakao.task.sprinkle.sprinkle;
 
-import com.kakao.task.sprinkle.common.TokenUtil;
 import com.kakao.task.sprinkle.domain.chat.Chat;
 import com.kakao.task.sprinkle.domain.chat.ChatRepository;
 import com.kakao.task.sprinkle.domain.sprinkle.Sprinkle;
@@ -13,6 +12,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultHandlers;
@@ -31,35 +31,34 @@ public class SprinkleApiTest {
     @Autowired
     ChatRepository chatRepository;
 
-    private final String token = TokenUtil.generateToken();
-
     User sprinkler;
     User receiver;
     Chat chat1;
-
-    Sprinkle sprinkle;
+    Sprinkle saveSprinkle;
 
     @BeforeEach
     public void setUp() {
         sprinkler = userRepository.save(new User("yeob32"));
         receiver = userRepository.save(new User("sykim"));
-        chat1 = chatRepository.save(new Chat());
-        sprinkle = Sprinkle.builder()
+        Chat chat = new Chat();
+        chat.addChatter(sprinkler, receiver);
+        chat1 = chatRepository.save(chat);
+        Sprinkle sprinkle = Sprinkle.builder()
                 .user(sprinkler)
                 .chat(chat1)
                 .amount(1000)
                 .divideCount(3)
                 .build();
         sprinkle.createSprinkle();
+        saveSprinkle = sprinkleRepository.save(sprinkle);
     }
 
     @Test
     @DisplayName("뿌리기 조회")
     public void mySprinkle() throws Exception {
-        Sprinkle saveSprinkle = sprinkleRepository.save(sprinkle);
         mockMvc.perform(MockMvcRequestBuilders.get("/sprinkle")
-                .header("X-USER-ID", sprinkler.getId())
                 .header("X-ROOM-ID", chat1.getId())
+                .header("X-USER-ID", sprinkler.getId())
                 .param("token", saveSprinkle.getToken()))
                 .andExpect(MockMvcResultMatchers.status().isOk())
                 .andDo(MockMvcResultHandlers.print());
@@ -69,10 +68,28 @@ public class SprinkleApiTest {
     @DisplayName("뿌리기 등록")
     public void sprinkle() throws Exception {
         mockMvc.perform(MockMvcRequestBuilders.post("/sprinkle")
-                .header("X-USER-ID", "1")
-                .header("X-ROOM-ID", "1")
-                .param("token", token))
+                .header("X-ROOM-ID", chat1.getId())
+                .header("X-USER-ID", sprinkler.getId())
+                .param("amount", "1000")
+                .param("divideCount", "3"))
                 .andExpect(MockMvcResultMatchers.status().isOk())
+                .andExpect(MockMvcResultMatchers.content().contentType(MediaType.APPLICATION_JSON))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.token").isNotEmpty())
+                .andExpect(MockMvcResultMatchers.jsonPath("$.token").isString())
+                .andDo(MockMvcResultHandlers.print());
+    }
+
+    @Test
+    @DisplayName("@RequestParam Exception 테스트")
+    public void sprinkleParameterException() throws Exception {
+        mockMvc.perform(MockMvcRequestBuilders.post("/sprinkle")
+                .header("X-ROOM-ID", chat1.getId())
+                .header("X-USER-ID", sprinkler.getId())
+                .param("divideCount", "3"))
+                .andExpect(MockMvcResultMatchers.status().isBadRequest())
+                .andExpect(MockMvcResultMatchers.content().contentType(MediaType.APPLICATION_JSON))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.status").value(400))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.message").value("Required parameter"))
                 .andDo(MockMvcResultHandlers.print());
     }
 }

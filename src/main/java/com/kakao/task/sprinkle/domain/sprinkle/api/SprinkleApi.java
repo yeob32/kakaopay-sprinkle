@@ -1,6 +1,6 @@
 package com.kakao.task.sprinkle.domain.sprinkle.api;
 
-import com.kakao.task.sprinkle.domain.sprinkle.application.ReceiveSprinkleService;
+import com.kakao.task.sprinkle.domain.sprinkle.application.ReceiveService;
 import com.kakao.task.sprinkle.domain.sprinkle.application.SprinkleService;
 import com.kakao.task.sprinkle.domain.sprinkle.dto.ReceiveDto;
 import com.kakao.task.sprinkle.domain.sprinkle.dto.SprinkleDto;
@@ -15,23 +15,29 @@ import java.util.UUID;
 public class SprinkleApi {
 
     private final SprinkleService sprinkleService;
-    private final ReceiveSprinkleService receiveSprinkleService;
+    private final ReceiveService receiveService;
 
     @PostMapping("/sprinkle")
     @ResponseStatus(HttpStatus.OK)
     public SprinkleDto.Res sprinkle(@RequestHeader("X-ROOM-ID") String roomId,
                                     @RequestHeader("X-USER-ID") String userId,
-                                    SprinkleDto.Req reqDto) {
+                                    @RequestParam long amount, @RequestParam int divideCount) {
 
-        reqDto.addHttpHeader(UUID.fromString(roomId), Long.parseLong(userId));
-        return new SprinkleDto.Res(sprinkleService.createSprinkle(reqDto));
+        SprinkleDto.Req req = SprinkleDto.Req.builder()
+                .roomId(UUID.fromString(roomId))
+                .userId(Long.parseLong(userId))
+                .amount(amount)
+                .divideCount(divideCount)
+                .build();
+
+        return new SprinkleDto.Res(sprinkleService.createSprinkle(req));
     }
 
     @GetMapping("/sprinkle")
     @ResponseStatus(HttpStatus.OK)
     public SprinkleDto.MyRes mySprinkle(@RequestHeader("X-ROOM-ID") String roomId,
                             @RequestHeader("X-USER-ID") String userId,
-                            String token) {
+                            @RequestParam String token) {
 
         SprinkleDto.MyReq myReqDto = SprinkleDto.MyReq.builder()
                 .roomId(UUID.fromString(roomId))
@@ -46,9 +52,14 @@ public class SprinkleApi {
     @ResponseStatus(HttpStatus.OK)
     public ReceiveDto.Res receive(@RequestHeader("X-ROOM-ID") String roomId,
                                   @RequestHeader("X-USER-ID") String userId,
-                                  ReceiveDto.Req dto) {
+                                  @RequestParam String token) {
 
-        dto.addHttpHeader(UUID.fromString(roomId), Long.parseLong(userId));
-        return new ReceiveDto.Res(receiveSprinkleService.receive(dto));
+        ReceiveDto.Req req = ReceiveDto.Req.builder()
+                .roomId(UUID.fromString(roomId))
+                .userId(Long.parseLong(userId))
+                .token(token)
+                .build();
+
+        return new ReceiveDto.Res(receiveService.receive(req));
     }
 }

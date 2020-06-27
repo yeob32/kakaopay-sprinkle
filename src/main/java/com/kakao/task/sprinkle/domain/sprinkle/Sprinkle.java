@@ -3,7 +3,7 @@ package com.kakao.task.sprinkle.domain.sprinkle;
 import com.kakao.task.sprinkle.domain.sprinkle.exception.DuplicateReceiveException;
 import com.kakao.task.sprinkle.domain.sprinkle.exception.ExpiredMySprinkleException;
 import com.kakao.task.sprinkle.domain.sprinkle.exception.ExpiredSprinkleException;
-import com.kakao.task.sprinkle.domain.sprinkle.exception.VerifyReceiver;
+import com.kakao.task.sprinkle.domain.sprinkle.exception.VerifyReceiverException;
 import com.kakao.task.sprinkle.global.common.TokenUtil;
 import com.kakao.task.sprinkle.domain.dividend.Dividend;
 import com.kakao.task.sprinkle.domain.chat.Chat;
@@ -65,26 +65,32 @@ public class Sprinkle {
         this.divideCount = divideCount;
     }
 
-    public void validateExpired() {
-        if (createdAt.isBefore(LocalDateTime.now().minusMinutes(10))) {
-            throw new ExpiredSprinkleException(ErrorCode.RECEIVE_EXPIRED);
-        }
-    }
-
-    public void validateReceive(User receiver) {
-        validateQualified(receiver);
-        receiveDuplication(receiver);
-    }
-
     public void validateExpiredByRetreive() {
         if (createdAt.isBefore(LocalDateTime.now().minusDays(7))) {
             throw new ExpiredMySprinkleException(ErrorCode.RETREIVE_EXPIRED);
         }
     }
 
+    public void receiveValidator(User receiver) {
+        validateExpired();
+        validateChatter(receiver);
+        validateQualified(receiver);
+        receiveDuplication(receiver);
+    }
+
+    private void validateChatter(User receiver) {
+        this.chat.checkContainsUser(receiver);
+    }
+
+    private void validateExpired() {
+        if (createdAt.isBefore(LocalDateTime.now().minusMinutes(10))) {
+            throw new ExpiredSprinkleException(ErrorCode.RECEIVE_EXPIRED);
+        }
+    }
+
     private void validateQualified(User receiver) {
         if(user.equals(receiver)) {
-            throw new VerifyReceiver(ErrorCode.VERIFY_RECEIVER);
+            throw new VerifyReceiverException(ErrorCode.VERIFY_RECEIVER);
         }
     }
 
@@ -100,10 +106,11 @@ public class Sprinkle {
     public void createSprinkle() {
         this.divideAmount();
         this.token = TokenUtil.generateToken();
+        this.chat.checkContainsUser(this.user);
     }
 
     private void divideAmount() {
-        this.dividends = this.devide().stream()
+        this.dividends = this.divide().stream()
                 .map(amount -> Dividend.builder()
                         .amount(amount)
                         .sprinkle(this)
@@ -111,16 +118,16 @@ public class Sprinkle {
                 .collect(Collectors.toList());
     }
 
-    private List<Long> devide() {
+    private List<Long> divide() {
         List<Long> amounts = new ArrayList<>();
         for (int i = 0; i < divideCount; i++) {
             long rest = amount % divideCount;
-            long devideAmount = amount / divideCount;
+            long divideAmount = amount / divideCount;
             if(rest > 0 && i == divideCount - 1) {
-                devideAmount = devideAmount + rest;
+                divideAmount = divideAmount + rest;
             }
 
-            amounts.add(devideAmount);
+            amounts.add(divideAmount);
         }
 
         return amounts;

@@ -7,7 +7,7 @@ import com.kakao.task.sprinkle.domain.dividend.dao.DividendRepository;
 import com.kakao.task.sprinkle.domain.sprinkle.exception.DuplicateReceiveException;
 import com.kakao.task.sprinkle.domain.sprinkle.Sprinkle;
 import com.kakao.task.sprinkle.domain.sprinkle.dao.SprinkleRepository;
-import com.kakao.task.sprinkle.domain.sprinkle.exception.VerifyReceiver;
+import com.kakao.task.sprinkle.domain.sprinkle.exception.VerifyReceiverException;
 import com.kakao.task.sprinkle.domain.user.User;
 import com.kakao.task.sprinkle.domain.user.UserRepository;
 import org.junit.jupiter.api.Assertions;
@@ -38,7 +38,9 @@ public class ReceiveTest {
     public void setUp() {
         sprinkler = userRepository.save(new User("yeob32"));
         receiver = userRepository.save(new User("sykim"));
-        chat1 = chatRepository.save(new Chat());
+        Chat chat = new Chat();
+        chat.addChatter(sprinkler, receiver);
+        chat1 = chatRepository.save(chat);
         sprinkle = Sprinkle.builder()
                 .user(sprinkler)
                 .chat(chat1)
@@ -46,6 +48,8 @@ public class ReceiveTest {
                 .divideCount(3)
                 .build();
         sprinkle.createSprinkle();
+
+
     }
 
     @Test
@@ -66,11 +70,10 @@ public class ReceiveTest {
     @Test
     @DisplayName("내 배당금 내가 받기")
     public void receiveMyMoney() {
-        Sprinkle saveSprinkle = sprinkleRepository.save(sprinkle);
+        sprinkleRepository.save(sprinkle);
         Sprinkle findSprinkle = sprinkleRepository.findByToken(sprinkle.getToken());
 
-        saveSprinkle.receiveValidator(sprinkler);
-        Assertions.assertThrows(VerifyReceiver.class, () -> findSprinkle.receiveValidator(sprinkler));
+        Assertions.assertThrows(VerifyReceiverException.class, () -> findSprinkle.receiveValidator(sprinkler));
     }
 
     @Test

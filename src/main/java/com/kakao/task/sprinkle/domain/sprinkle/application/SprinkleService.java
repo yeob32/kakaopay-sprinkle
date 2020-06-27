@@ -33,34 +33,34 @@ public class SprinkleService {
     }
 
     @Transactional(readOnly = true)
+    public Sprinkle getSprinkle(SprinkleDto.Req requestDto) {
+        User sprinkler = userRepository.findById(requestDto.getUserId())
+                .orElseThrow(() -> new DataNotFoundException(requestDto.getUserId(), ErrorCode.USER_NOT_FOUND));
+        Chat chat = chatRepository.findById(requestDto.getRoomId())
+                .orElseThrow(() -> new DataNotFoundException(requestDto.getRoomId(), ErrorCode.CHAT_NOT_FOUND));
+
+        return Sprinkle.builder()
+                .user(sprinkler)
+                .chat(chat)
+                .amount(requestDto.getAmount())
+                .divideCount(requestDto.getDivideCount())
+                .build();
+    }
+
+    @Transactional(readOnly = true)
     public SprinkleDto.MyRes mySprinkle(SprinkleDto.MyReq myReqDto) {
         Sprinkle sprinkle = sprinkleRepository.findByToken(myReqDto.getToken());
-        if (sprinkle == null)
-            throw new DataNotFoundException(myReqDto.getToken(), ErrorCode.DATA_NOT_FOUND);
-        sprinkle.validateExpiredByRetreive();
+        if (sprinkle == null) {
+            throw new DataNotFoundException(myReqDto.getToken(), ErrorCode.SPRINKLE_NOT_FOUND);
+        }
 
+        sprinkle.validateExpiredByRetreive();
         List<Dividend> dividends = sprinkle.getDividends();
 
         return SprinkleDto.MyRes
                 .builder()
                 .sprinkle(sprinkle)
                 .dividends(dividends)
-                .build();
-    }
-
-    @Transactional(readOnly = true)
-    public Sprinkle getSprinkle(SprinkleDto.Req requestDto) {
-        User sprinkler = userRepository.findById(requestDto.getUserId())
-                .orElseThrow(() -> new DataNotFoundException(String.valueOf(requestDto.getUserId()), ErrorCode.DATA_NOT_FOUND));
-        Chat chat = chatRepository.findById(requestDto.getRoomId())
-                .orElseThrow(() -> new DataNotFoundException(requestDto.getRoomId().toString(), ErrorCode.DATA_NOT_FOUND));
-        chat.checkContainsUser(sprinkler);
-
-        return Sprinkle.builder()
-                .user(sprinkler)
-                .chat(chat)
-                .amount(requestDto.getAmount())
-                .divideCount(requestDto.getDevideCount())
                 .build();
     }
 }

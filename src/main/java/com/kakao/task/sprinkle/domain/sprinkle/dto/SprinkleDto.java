@@ -32,15 +32,15 @@ public class SprinkleDto {
     public static class Req {
         private long userId;
         private UUID roomId;
-        private int amount;
-        private int devideCount;
+        private long amount;
+        private int divideCount;
 
         @Builder
-        public Req(long userId, UUID roomId, int amount, int devideCount) {
+        public Req(long userId, UUID roomId, long amount, int divideCount) {
             this.userId = userId;
             this.roomId = roomId;
             this.amount = amount;
-            this.devideCount = devideCount;
+            this.divideCount = divideCount;
         }
 
         public Req addHttpHeader(UUID roomId, long userId) {

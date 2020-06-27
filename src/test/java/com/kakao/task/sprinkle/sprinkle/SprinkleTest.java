@@ -3,7 +3,7 @@ package com.kakao.task.sprinkle.sprinkle;
 import com.kakao.task.sprinkle.domain.chat.Chat;
 import com.kakao.task.sprinkle.domain.chat.ChatRepository;
 import com.kakao.task.sprinkle.domain.dividend.Dividend;
-import com.kakao.task.sprinkle.domain.dividend.DividendRepository;
+import com.kakao.task.sprinkle.domain.dividend.dao.DividendRepository;
 import com.kakao.task.sprinkle.domain.sprinkle.Sprinkle;
 import com.kakao.task.sprinkle.domain.sprinkle.dao.SprinkleRepository;
 import com.kakao.task.sprinkle.domain.user.User;
@@ -38,6 +38,7 @@ public class SprinkleTest {
         sprinkler = userRepository.save(new User("yeob32"));
         receiver = userRepository.save(new User("sykim"));
         chat1 = chatRepository.save(new Chat());
+        chat1.addChatter(sprinkler, receiver);
         sprinkle = Sprinkle.builder()
                 .user(sprinkler)
                 .chat(chat1)
@@ -50,9 +51,9 @@ public class SprinkleTest {
     @Test
     @DisplayName("배당금 확인")
     public void sumDivdideAmount() {
-        int totalAmount = sprinkle.getDividends()
+        long totalAmount = sprinkle.getDividends()
                 .stream()
-                .mapToInt(Dividend::getAmount)
+                .mapToLong(Dividend::getAmount)
                 .sum();
 
         Assertions.assertEquals(1000, totalAmount);
@@ -80,7 +81,7 @@ public class SprinkleTest {
         Assertions.assertEquals(3, sprinkle.getDividends().size());
         Assertions.assertEquals(1000, sprinkle.getDividends()
                 .stream()
-                .mapToInt(Dividend::getAmount)
+                .mapToLong(Dividend::getAmount)
                 .sum());
     }
 

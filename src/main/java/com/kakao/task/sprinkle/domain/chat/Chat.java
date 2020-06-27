@@ -1,12 +1,14 @@
 package com.kakao.task.sprinkle.domain.chat;
 
 import com.kakao.task.sprinkle.domain.user.User;
+import com.kakao.task.sprinkle.global.exception.ErrorCode;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
 
@@ -29,9 +31,17 @@ public class Chat {
         this.id = id;
     }
 
-    public void checkContainsUser(final User findUser) {
-        if(this.users.stream().anyMatch(u -> u == findUser)) {
-            throw new RuntimeException();
+    public void addChatter(User... receviers) {
+        users.addAll(Arrays.asList(receviers));
+    }
+
+    public void addChatter(List<User> receviers) {
+        users.addAll(receviers);
+    }
+
+    public void checkContainsUser(final User receiver) {
+        if(this.users.stream().noneMatch(user -> user == receiver)) {
+            throw new InvalidChatterException(ErrorCode.INVALID_CHATTER);
         }
     }
 }
