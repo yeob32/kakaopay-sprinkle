@@ -15,6 +15,7 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 @Entity
 @Table(name = "sprinkle")
@@ -70,7 +71,7 @@ public class Sprinkle {
     }
 
     public void checkInvalidChat(Chat chat) {
-        if(!this.chat.equals(chat)) {
+        if (!this.chat.equals(chat)) {
             throw new InvalidSprinkleException(ErrorCode.INVALID_SPRINKLE);
         }
     }
@@ -127,15 +128,22 @@ public class Sprinkle {
     }
 
     private List<Long> divide() {
+        long restAmount = amount;
+
         List<Long> amounts = new ArrayList<>();
         for (int i = 0; i < divideCount; i++) {
-            long rest = amount % divideCount;
-            long divideAmount = amount / divideCount;
-            if (rest > 0 && i == divideCount - 1) {
-                divideAmount = divideAmount + rest;
+            if (divideCount - 1 == i) {
+                amounts.add(restAmount);
+                break;
             }
 
-            amounts.add(divideAmount);
+            long random = (long) ((Math.random() * amount) + 1);
+            if(random == restAmount) {
+                random = random / 2;
+            }
+
+            restAmount = restAmount - random;
+            amounts.add(random);
         }
 
         return amounts;
