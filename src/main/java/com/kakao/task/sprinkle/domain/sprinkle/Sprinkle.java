@@ -138,7 +138,7 @@ public class Sprinkle {
             }
 
             long random = (long) ((Math.random() * amount) + 1);
-            if(random == restAmount) {
+            if (random == restAmount) {
                 random = random / 2;
             }
 

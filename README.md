@@ -30,9 +30,58 @@
 GlobalControllerAdvice , ExceptionHandler 를 통하여 관리 집중 
 
 **뿌리기 배당금**
-나머지 값이 있을 경우 마지막 배당금이 나머지 금액을 갖는다.
+난수를 이용하여 인원 수 만큼 뿌리기 금액을 무작위로 배당한다.
 
 **테스트 케이스**
 해당 과제의 모든 요구 사항에 대한 단위 테스트 및 통합 테스트 케이스를 작성한다.
+
+## 주요 기능
+
+**뿌리기 조회**
+- 요청 `GET` `/sprinkle`
+- `token` : a1f
+```
+{
+  "token": "a1f",
+  "createdAt": "2020-06-27T17:40:42.066438",
+  "divideCount": 3,
+  "receivedAmount": 0,
+  "dividends": [
+    {
+      "id": 4,
+      "amount": 686
+    },
+    {
+      "id": 5,
+      "amount": 37
+    },
+    {
+      "id": 6,
+      "amount": 277
+    }
+  ]
+}
+```
+
+**뿌리기**
+- 요청 `POST` `/sprinkle`
+- `divideCount` : 1000
+- `divideCount` : 3
+```
+{
+  "token": "dbd"
+}
+```
+
+**뿌리기 받기**
+- 요청 `POST` `/receive`
+- `token` : a1f
+```
+{
+  "receivedAmount": 434
+}
+```
+
                                
+
                               
