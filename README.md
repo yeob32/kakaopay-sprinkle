@@ -44,6 +44,7 @@ GlobalControllerAdvice , ExceptionHandler 를 통하여 관리 집중
 {
   "token": "a1f",
   "createdAt": "2020-06-27T17:40:42.066438",
+  "amount":1000,
   "divideCount": 3,
   "receivedAmount": 0,
   "dividends": [

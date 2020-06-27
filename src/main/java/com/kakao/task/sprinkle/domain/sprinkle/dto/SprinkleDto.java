@@ -66,6 +66,7 @@ public class SprinkleDto {
     public static class MyRes {
         private String token;
         private LocalDateTime createdAt;
+        private long amount;
         private int divideCount;
         private long receivedAmount;
         private List<MyDividend> dividends;
@@ -74,6 +75,7 @@ public class SprinkleDto {
         public MyRes(Sprinkle sprinkle, List<Dividend> dividends) {
             this.token = sprinkle.getToken();
             this.createdAt = sprinkle.getCreatedAt();
+            this.amount = sprinkle.getAmount();
             this.divideCount = sprinkle.getDivideCount();
             this.receivedAmount = sprinkle.getReceivedAmount();
             this.dividends = dividends.stream()
