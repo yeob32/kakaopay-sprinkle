@@ -68,6 +68,22 @@ public class ReceiveTest {
     }
 
     @Test
+    @DisplayName("배당금 받은 후 받기 완료 금액 확인")
+    public void checkReceivedAmount() {
+        Sprinkle saveSprinkle = sprinkleRepository.save(sprinkle);
+        Sprinkle findSprinkle = sprinkleRepository.findByToken(sprinkle.getToken());
+
+        saveSprinkle.receiveValidator(receiver);
+        Dividend usableDividend = findSprinkle.getDividends().stream().filter(Dividend::usable).findFirst().get();
+
+        User user = userRepository.findById(receiver.getId()).orElse(null);
+        usableDividend.allotMoney(user);
+        findSprinkle.totalReceivedAmount(usableDividend);
+
+        Assertions.assertTrue(findSprinkle.getAmount() > 0);
+    }
+
+    @Test
     @DisplayName("내 배당금 내가 받기")
     public void receiveMyMoney() {
         sprinkleRepository.save(sprinkle);

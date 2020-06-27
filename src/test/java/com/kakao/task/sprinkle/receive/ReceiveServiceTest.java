@@ -38,7 +38,6 @@ public class ReceiveServiceTest {
     @Autowired
     ReceiveService receiveService;
 
-
     Sprinkle bigSprinkle;
 
     User sprinkler;
@@ -47,14 +46,6 @@ public class ReceiveServiceTest {
 
     final long totalAmount = 112852880123213213L;
     final int divideCount = 241;
-
-    @AfterEach
-    public void end() {
-//        userRepository.deleteAll();
-//        chatRepository.deleteAll();
-//        sprinkleRepository.deleteAll();
-//        dividendRepository.deleteAll();
-    }
 
     @BeforeEach
     public void setUp() {

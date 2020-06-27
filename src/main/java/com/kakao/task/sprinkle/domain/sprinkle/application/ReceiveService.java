@@ -1,6 +1,5 @@
 package com.kakao.task.sprinkle.domain.sprinkle.application;
 
-import com.kakao.task.sprinkle.domain.chat.Chat;
 import com.kakao.task.sprinkle.domain.dividend.Dividend;
 import com.kakao.task.sprinkle.domain.sprinkle.Sprinkle;
 import com.kakao.task.sprinkle.domain.sprinkle.dao.SprinkleRepository;
@@ -34,6 +33,7 @@ public class ReceiveService {
                 .findFirst()
                 .orElseThrow(() -> new CloseSprinkleException(ErrorCode.SPRINKLE_CLOSE));
         usableDividend.allotMoney(user);
+        sprinkle.totalReceivedAmount(usableDividend);
 
         return usableDividend;
     }

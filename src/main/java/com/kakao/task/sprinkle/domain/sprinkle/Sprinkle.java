@@ -89,7 +89,7 @@ public class Sprinkle {
     }
 
     private void validateQualified(User receiver) {
-        if(user.equals(receiver)) {
+        if (user.equals(receiver)) {
             throw new VerifyReceiverException(ErrorCode.VERIFY_RECEIVER);
         }
     }
@@ -98,9 +98,13 @@ public class Sprinkle {
         boolean duplication = this.dividends.stream()
                 .filter(dividend -> !dividend.usable())
                 .anyMatch(dividend -> dividend.getUser().equals(receiver));
-        if(duplication) {
+        if (duplication) {
             throw new DuplicateReceiveException(ErrorCode.RECEIVE_DUPLICATION);
         }
+    }
+
+    public void totalReceivedAmount(Dividend dividend) {
+        this.receivedAmount += dividend.getAmount();
     }
 
     public void createSprinkle() {
@@ -123,7 +127,7 @@ public class Sprinkle {
         for (int i = 0; i < divideCount; i++) {
             long rest = amount % divideCount;
             long divideAmount = amount / divideCount;
-            if(rest > 0 && i == divideCount - 1) {
+            if (rest > 0 && i == divideCount - 1) {
                 divideAmount = divideAmount + rest;
             }
 

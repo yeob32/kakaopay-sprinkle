@@ -99,4 +99,27 @@ public class ReceiveApiTest {
                 .andExpect(MockMvcResultMatchers.jsonPath("$.message").value(ErrorCode.VERIFY_RECEIVER.getMessage()))
                 .andDo(MockMvcResultHandlers.print());
     }
+
+    @Test
+    @DisplayName("받고 나서 해당 뿌리기 조회")
+    public void receiveAndMySprinkle() throws Exception {
+        mockMvc.perform(MockMvcRequestBuilders.post("/receive")
+                .header("X-ROOM-ID", chat.getId())
+                .header("X-USER-ID", receiver.getId())
+                .param("token", saveSprinkle1.getToken()))
+                .andExpect(MockMvcResultMatchers.status().isOk())
+                .andExpect(MockMvcResultMatchers.content().contentType(MediaType.APPLICATION_JSON))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.receivedAmount").isNotEmpty())
+                .andExpect(MockMvcResultMatchers.jsonPath("$.receivedAmount").isNumber())
+                .andDo(MockMvcResultHandlers.print());
+
+        mockMvc.perform(MockMvcRequestBuilders.get("/sprinkle")
+                .header("X-ROOM-ID", chat.getId())
+                .header("X-USER-ID", sprinkler1.getId())
+                .param("token", saveSprinkle1.getToken()))
+                .andExpect(MockMvcResultMatchers.content().contentType(MediaType.APPLICATION_JSON))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.receivedAmount").isNotEmpty())
+                .andExpect(MockMvcResultMatchers.jsonPath("$.receivedAmount").isNumber())
+                .andDo(MockMvcResultHandlers.print());
+    }
 }
