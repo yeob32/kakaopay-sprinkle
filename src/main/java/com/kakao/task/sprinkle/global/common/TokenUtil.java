@@ -1,4 +1,4 @@
-package com.kakao.task.sprinkle.common;
+package com.kakao.task.sprinkle.global.common;
 
 import java.util.UUID;
 

@@ -6,11 +6,10 @@ import com.kakao.task.sprinkle.domain.dividend.Dividend;
 import com.kakao.task.sprinkle.domain.sprinkle.Sprinkle;
 import com.kakao.task.sprinkle.domain.sprinkle.dao.SprinkleRepository;
 import com.kakao.task.sprinkle.domain.sprinkle.dto.SprinkleDto;
-import com.kakao.task.sprinkle.domain.sprinkle.exception.ChatNotFoundException;
-import com.kakao.task.sprinkle.domain.sprinkle.exception.NotFoundSprinkleException;
-import com.kakao.task.sprinkle.domain.sprinkle.exception.UserNotFoundException;
+import com.kakao.task.sprinkle.domain.sprinkle.exception.DataNotFoundException;
 import com.kakao.task.sprinkle.domain.user.User;
 import com.kakao.task.sprinkle.domain.user.UserRepository;
+import com.kakao.task.sprinkle.global.exception.ErrorCode;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -36,8 +35,8 @@ public class SprinkleService {
     @Transactional(readOnly = true)
     public SprinkleDto.MyRes mySprinkle(SprinkleDto.MyReq myReqDto) {
         Sprinkle sprinkle = sprinkleRepository.findByToken(myReqDto.getToken());
-        if(sprinkle == null)
-            throw new NotFoundSprinkleException();
+        if (sprinkle == null)
+            throw new DataNotFoundException(myReqDto.getToken(), ErrorCode.DATA_NOT_FOUND);
         sprinkle.validateExpiredByRetreive();
 
         List<Dividend> dividends = sprinkle.getDividends();
@@ -51,8 +50,10 @@ public class SprinkleService {
 
     @Transactional(readOnly = true)
     public Sprinkle getSprinkle(SprinkleDto.Req requestDto) {
-        User sprinkler = userRepository.findById(requestDto.getUserId()).orElseThrow(() -> new UserNotFoundException(""));
-        Chat chat = chatRepository.findById(requestDto.getRoomId()).orElseThrow(() -> new ChatNotFoundException(requestDto.getRoomId().toString()));
+        User sprinkler = userRepository.findById(requestDto.getUserId())
+                .orElseThrow(() -> new DataNotFoundException(String.valueOf(requestDto.getUserId()), ErrorCode.DATA_NOT_FOUND));
+        Chat chat = chatRepository.findById(requestDto.getRoomId())
+                .orElseThrow(() -> new DataNotFoundException(requestDto.getRoomId().toString(), ErrorCode.DATA_NOT_FOUND));
         chat.checkContainsUser(sprinkler);
 
         return Sprinkle.builder()

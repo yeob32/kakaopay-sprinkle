@@ -1,9 +1,7 @@
 package com.kakao.task.sprinkle.domain.sprinkle.dto;
 
-import com.kakao.task.sprinkle.domain.chat.Chat;
 import com.kakao.task.sprinkle.domain.dividend.Dividend;
 import com.kakao.task.sprinkle.domain.sprinkle.Sprinkle;
-import com.kakao.task.sprinkle.domain.user.User;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
@@ -51,15 +49,6 @@ public class SprinkleDto {
 
             return this;
         }
-
-        public Sprinkle toEntity() {
-            return Sprinkle.builder()
-                    .chat(new Chat(roomId))
-                    .user(new User(userId))
-                    .amount(amount)
-                    .divideCount(devideCount)
-                    .build();
-        }
     }
 
     @Getter
@@ -78,8 +67,8 @@ public class SprinkleDto {
         private String token;
         private LocalDateTime createdAt;
         private int divideCount;
-        private int receivedAmount;
-        private List<Dividend> dividends;
+        private long receivedAmount;
+        private List<MyDividend> dividends;
 
         @Builder
         public MyRes(Sprinkle sprinkle, List<Dividend> dividends) {
@@ -87,7 +76,20 @@ public class SprinkleDto {
             this.createdAt = sprinkle.getCreatedAt();
             this.divideCount = sprinkle.getDivideCount();
             this.receivedAmount = sprinkle.getReceivedAmount();
-            this.dividends = dividends.stream().collect(Collectors.toList());
+            this.dividends = dividends.stream()
+                    .map(MyDividend::new)
+                    .collect(Collectors.toList());
+        }
+
+        @Getter
+        public static class MyDividend {
+            private final long id;
+            private final long amount;
+
+            public MyDividend(Dividend dividend) {
+                this.id = dividend.getId();
+                this.amount = dividend.getAmount();
+            }
         }
     }
 
@@ -103,13 +105,6 @@ public class SprinkleDto {
             this.userId = userId;
             this.roomId = roomId;
             this.token = token;
-        }
-
-        public MyReq addHttpHeader(UUID roomId, long userId) {
-            this.roomId = roomId;
-            this.userId = userId;
-
-            return this;
         }
     }
 }

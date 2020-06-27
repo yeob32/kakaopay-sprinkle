@@ -37,7 +37,7 @@ public class ReceiveDto {
     @Getter
     @NoArgsConstructor(access = AccessLevel.PROTECTED)
     public static class Res {
-        int receivedAmount;
+        long receivedAmount;
 
         public Res(Dividend dividend) {
             this.receivedAmount = dividend.getAmount();

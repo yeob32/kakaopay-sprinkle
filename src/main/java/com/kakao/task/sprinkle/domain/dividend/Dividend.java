@@ -1,7 +1,9 @@
 package com.kakao.task.sprinkle.domain.dividend;
 
+import com.kakao.task.sprinkle.domain.sprinkle.exception.DuplicateReceiveException;
 import com.kakao.task.sprinkle.domain.sprinkle.Sprinkle;
 import com.kakao.task.sprinkle.domain.user.User;
+import com.kakao.task.sprinkle.global.exception.ErrorCode;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
@@ -20,7 +22,7 @@ public class Dividend {
     private Long id;
 
     @Column(name = "amount")
-    private int amount;
+    private long amount;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "sprinkle_id")
@@ -30,21 +32,14 @@ public class Dividend {
     private User user;
 
     @Builder
-    public Dividend(int amount, Sprinkle sprinkle, User user) {
+    public Dividend(long amount, Sprinkle sprinkle, User user) {
         this.amount = amount;
         this.sprinkle = sprinkle;
         this.user = user;
     }
 
     public void allotUser(User receiver) {
-        checkDuplication(receiver);
         this.user = receiver;
-    }
-
-    private void checkDuplication(User receiver) {
-        if(user.equals(receiver)) {
-            throw new RuntimeException();
-        }
     }
 
     public boolean usable() {

@@ -4,8 +4,10 @@ import com.kakao.task.sprinkle.domain.dividend.Dividend;
 import com.kakao.task.sprinkle.domain.sprinkle.Sprinkle;
 import com.kakao.task.sprinkle.domain.sprinkle.dao.SprinkleRepository;
 import com.kakao.task.sprinkle.domain.sprinkle.dto.ReceiveDto;
+import com.kakao.task.sprinkle.domain.sprinkle.exception.CloseSprinkleException;
 import com.kakao.task.sprinkle.domain.user.User;
 import com.kakao.task.sprinkle.domain.user.UserRepository;
+import com.kakao.task.sprinkle.global.exception.ErrorCode;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -26,7 +28,7 @@ public class ReceiveSprinkleService {
         Dividend usableDividend = sprinkle.getDividends().stream()
                 .filter(Dividend::usable)
                 .findFirst()
-                .orElseThrow(() -> new RuntimeException());
+                .orElseThrow(() -> new CloseSprinkleException(ErrorCode.SPRINKLE_CLOSE));
 
         User user = userRepository.findById(req.getUserId()).orElse(null);
         usableDividend.allotUser(user);

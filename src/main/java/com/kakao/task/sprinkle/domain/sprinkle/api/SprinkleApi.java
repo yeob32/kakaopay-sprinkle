@@ -6,7 +6,6 @@ import com.kakao.task.sprinkle.domain.sprinkle.dto.ReceiveDto;
 import com.kakao.task.sprinkle.domain.sprinkle.dto.SprinkleDto;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
-import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.UUID;

@@ -1,9 +1,14 @@
 package com.kakao.task.sprinkle.domain.sprinkle;
 
-import com.kakao.task.sprinkle.common.TokenUtil;
+import com.kakao.task.sprinkle.domain.sprinkle.exception.DuplicateReceiveException;
+import com.kakao.task.sprinkle.domain.sprinkle.exception.ExpiredMySprinkleException;
+import com.kakao.task.sprinkle.domain.sprinkle.exception.ExpiredSprinkleException;
+import com.kakao.task.sprinkle.domain.sprinkle.exception.VerifyReceiver;
+import com.kakao.task.sprinkle.global.common.TokenUtil;
 import com.kakao.task.sprinkle.domain.dividend.Dividend;
 import com.kakao.task.sprinkle.domain.chat.Chat;
 import com.kakao.task.sprinkle.domain.user.User;
+import com.kakao.task.sprinkle.global.exception.ErrorCode;
 import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
 
@@ -37,13 +42,13 @@ public class Sprinkle {
     private Chat chat;
 
     @Column(name = "amount")
-    private int amount;
+    private long amount;
 
     @Column(name = "divide_count")
     private int divideCount;
 
     @Column(name = "received_amount")
-    private int receivedAmount;
+    private long receivedAmount;
 
     @CreationTimestamp
     @Column(name = "created_at", nullable = false, updatable = false)
@@ -53,7 +58,7 @@ public class Sprinkle {
     private List<Dividend> dividends = new ArrayList<>();
 
     @Builder
-    public Sprinkle(User user, Chat chat, int amount, int divideCount) {
+    public Sprinkle(User user, Chat chat, long amount, int divideCount) {
         this.user = user;
         this.chat = chat;
         this.amount = amount;
@@ -62,19 +67,33 @@ public class Sprinkle {
 
     public void validateExpired() {
         if (createdAt.isBefore(LocalDateTime.now().minusMinutes(10))) {
-            throw new RuntimeException();
+            throw new ExpiredSprinkleException(ErrorCode.RECEIVE_EXPIRED);
         }
+    }
+
+    public void validateReceive(User receiver) {
+        validateQualified(receiver);
+        receiveDuplication(receiver);
     }
 
     public void validateExpiredByRetreive() {
         if (createdAt.isBefore(LocalDateTime.now().minusDays(7))) {
-            throw new RuntimeException();
+            throw new ExpiredMySprinkleException(ErrorCode.RETREIVE_EXPIRED);
         }
     }
 
-    public void validateQualified(User receiveUser) {
-        if(user.equals(receiveUser)) {
-            throw new RuntimeException();
+    private void validateQualified(User receiver) {
+        if(user.equals(receiver)) {
+            throw new VerifyReceiver(ErrorCode.VERIFY_RECEIVER);
+        }
+    }
+
+    private void receiveDuplication(User receiver) {
+        boolean duplication = this.dividends.stream()
+                .filter(dividend -> !dividend.usable())
+                .anyMatch(dividend -> dividend.getUser().equals(receiver));
+        if(duplication) {
+            throw new DuplicateReceiveException(ErrorCode.RECEIVE_DUPLICATION);
         }
     }
 
@@ -92,11 +111,11 @@ public class Sprinkle {
                 .collect(Collectors.toList());
     }
 
-    private List<Integer> devide() {
-        List<Integer> amounts = new ArrayList<>();
+    private List<Long> devide() {
+        List<Long> amounts = new ArrayList<>();
         for (int i = 0; i < divideCount; i++) {
-            int rest = amount % divideCount;
-            int devideAmount = amount / divideCount;
+            long rest = amount % divideCount;
+            long devideAmount = amount / divideCount;
             if(rest > 0 && i == divideCount - 1) {
                 devideAmount = devideAmount + rest;
             }
