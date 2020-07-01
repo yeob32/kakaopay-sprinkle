@@ -31,13 +31,6 @@ public class SprinkleDto {
             this.amount = amount;
             this.divideCount = divideCount;
         }
-
-        public Req addHttpHeader(UUID roomId, long userId) {
-            this.roomId = roomId;
-            this.userId = userId;
-
-            return this;
-        }
     }
 
     @Getter

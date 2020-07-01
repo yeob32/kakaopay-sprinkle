@@ -15,9 +15,9 @@ public class ReceiveDto {
     @Getter
     @NoArgsConstructor(access = AccessLevel.PROTECTED)
     public static class Req {
-        String token;
-        long userId;
-        UUID roomId;
+        private String token;
+        private long userId;
+        private UUID roomId;
 
         @Builder
         public Req(String token, long userId, UUID roomId) {
@@ -30,7 +30,7 @@ public class ReceiveDto {
     @Getter
     @NoArgsConstructor(access = AccessLevel.PROTECTED)
     public static class Res {
-        long receivedAmount;
+        private long receivedAmount;
 
         public Res(Dividend dividend) {
             this.receivedAmount = dividend.getAmount();
