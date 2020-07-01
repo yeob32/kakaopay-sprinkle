@@ -16,17 +16,6 @@ import java.util.stream.Collectors;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class SprinkleDto {
 
-    private String token;
-    private long userId;
-    private UUID roomId;
-
-    @Builder
-    public SprinkleDto(String token, long userId, UUID roomId) {
-        this.token = token;
-        this.userId = userId;
-        this.roomId = roomId;
-    }
-
     @Getter
     @NoArgsConstructor(access = AccessLevel.PROTECTED)
     public static class Req {

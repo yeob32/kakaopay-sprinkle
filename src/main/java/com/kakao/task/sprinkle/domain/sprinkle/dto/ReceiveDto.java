@@ -25,13 +25,6 @@ public class ReceiveDto {
             this.userId = userId;
             this.roomId = roomId;
         }
-
-        public Req addHttpHeader(UUID roomId, long userId) {
-            this.roomId = roomId;
-            this.userId = userId;
-
-            return this;
-        }
     }
 
     @Getter

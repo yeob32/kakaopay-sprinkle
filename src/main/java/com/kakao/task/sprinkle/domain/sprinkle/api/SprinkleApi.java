@@ -1,13 +1,9 @@
 package com.kakao.task.sprinkle.domain.sprinkle.api;
 
-import com.kakao.task.sprinkle.domain.chat.Chat;
-import com.kakao.task.sprinkle.domain.chat.ChatRepository;
 import com.kakao.task.sprinkle.domain.sprinkle.application.ReceiveService;
 import com.kakao.task.sprinkle.domain.sprinkle.application.SprinkleService;
 import com.kakao.task.sprinkle.domain.sprinkle.dto.ReceiveDto;
 import com.kakao.task.sprinkle.domain.sprinkle.dto.SprinkleDto;
-import com.kakao.task.sprinkle.domain.user.User;
-import com.kakao.task.sprinkle.domain.user.UserRepository;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
