@@ -10,21 +10,15 @@ import com.kakao.task.sprinkle.domain.sprinkle.application.ReceiveService;
 import com.kakao.task.sprinkle.domain.sprinkle.application.SprinkleService;
 import com.kakao.task.sprinkle.domain.sprinkle.dao.SprinkleRepository;
 import com.kakao.task.sprinkle.domain.sprinkle.dto.ReceiveDto;
-import com.kakao.task.sprinkle.domain.sprinkle.dto.SprinkleDto;
 import com.kakao.task.sprinkle.domain.sprinkle.exception.CloseSprinkleException;
 import com.kakao.task.sprinkle.domain.sprinkle.exception.InvalidSprinkleException;
 import com.kakao.task.sprinkle.domain.user.User;
 import com.kakao.task.sprinkle.domain.user.UserRepository;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.boot.test.context.SpringBootTest;
 
-import java.util.Arrays;
 import java.util.List;
-import java.util.function.Predicate;
-import java.util.stream.Collectors;
-import java.util.stream.IntStream;
 
 @SpringBootTest
 public class ReceiveServiceTest {

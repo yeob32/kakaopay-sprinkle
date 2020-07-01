@@ -24,7 +24,7 @@ public class Chat {
     @Column(name = "chat_id")
     private UUID id;
 
-    @OneToMany(mappedBy = "chat", fetch = FetchType.LAZY, cascade = CascadeType.PERSIST, orphanRemoval = true)
+    @OneToMany(mappedBy = "chat", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     private List<ChatUser> chatUsers = new ArrayList<>();
 
     public static Chat createChat(List<ChatUser> chatUsers) {
