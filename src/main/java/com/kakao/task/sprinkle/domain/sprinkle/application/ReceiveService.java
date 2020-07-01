@@ -31,6 +31,10 @@ public class ReceiveService {
                 .orElseThrow(() -> new DataNotFoundException(req.getUserId(), ErrorCode.USER_NOT_FOUND));
 
         Sprinkle sprinkle = sprinkleRepository.findByToken(req.getToken());
+        if(sprinkle == null) {
+            throw new DataNotFoundException(req.getToken(), ErrorCode.SPRINKLE_NOT_FOUND);
+        }
+
         sprinkle.checkInvalidChat(chat);
         sprinkle.receiveValidator(user);
 

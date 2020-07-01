@@ -27,7 +27,6 @@ public class SprinkleService {
     @Transactional
     public Sprinkle createSprinkle(SprinkleDto.Req requestDto) {
         Sprinkle sprinkle = getSprinkle(requestDto);
-        sprinkle.createSprinkle();
 
         return sprinkleRepository.save(sprinkle);
     }

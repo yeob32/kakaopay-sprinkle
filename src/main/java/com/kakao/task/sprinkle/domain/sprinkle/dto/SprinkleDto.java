@@ -79,6 +79,7 @@ public class SprinkleDto {
             this.divideCount = sprinkle.getDivideCount();
             this.receivedAmount = sprinkle.getReceivedAmount();
             this.dividends = dividends.stream()
+                    .filter(dividend -> !dividend.usable())
                     .map(MyDividend::new)
                     .collect(Collectors.toList());
         }
@@ -89,7 +90,7 @@ public class SprinkleDto {
             private final long amount;
 
             public MyDividend(Dividend dividend) {
-                this.id = dividend.getId();
+                this.id = dividend.getUser().getId();
                 this.amount = dividend.getAmount();
             }
         }

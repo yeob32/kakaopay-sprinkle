@@ -18,7 +18,8 @@ import javax.persistence.*;
 public class Dividend {
 
     @Id
-    @GeneratedValue
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "dividend_id")
     private Long id;
 
     @Column(name = "amount")
@@ -29,6 +30,7 @@ public class Dividend {
     private Sprinkle sprinkle;
 
     @OneToOne
+    @JoinColumn(name = "user_id")
     private User user;
 
     @Builder

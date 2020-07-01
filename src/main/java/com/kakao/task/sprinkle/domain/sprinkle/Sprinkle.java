@@ -25,7 +25,7 @@ import java.util.stream.IntStream;
 public class Sprinkle {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue
     @Column(name = "sprinkle_id")
     private Long id;
 
@@ -37,7 +37,7 @@ public class Sprinkle {
     private User user;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "room_id")
+    @JoinColumn(name = "chat_id")
     private Chat chat;
 
     @Column(name = "amount")
@@ -53,7 +53,7 @@ public class Sprinkle {
     @Column(name = "created_at", nullable = false, updatable = false)
     private LocalDateTime createdAt;
 
-    @OneToMany(mappedBy = "sprinkle", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "sprinkle", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Dividend> dividends = new ArrayList<>();
 
     @Builder
@@ -62,6 +62,7 @@ public class Sprinkle {
         this.chat = chat;
         this.amount = amount;
         this.divideCount = divideCount;
+        createSprinkle();
     }
 
     public void validateExpiredByRetreive() {
@@ -115,7 +116,7 @@ public class Sprinkle {
     public void createSprinkle() {
         this.divideAmount();
         this.token = TokenUtil.generateToken();
-        this.chat.checkContainsUser(this.user);
+        this.validateChatter(this.user);
     }
 
     private void divideAmount() {

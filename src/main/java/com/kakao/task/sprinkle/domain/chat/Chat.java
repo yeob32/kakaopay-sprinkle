@@ -1,5 +1,6 @@
 package com.kakao.task.sprinkle.domain.chat;
 
+import com.kakao.task.sprinkle.domain.chatUser.ChatUser;
 import com.kakao.task.sprinkle.domain.user.User;
 import com.kakao.task.sprinkle.global.exception.ErrorCode;
 import lombok.EqualsAndHashCode;
@@ -8,7 +9,6 @@ import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
 
@@ -24,23 +24,25 @@ public class Chat {
     @Column(name = "chat_id")
     private UUID id;
 
-    @OneToMany(fetch = FetchType.LAZY)
-    private List<User> users = new ArrayList<>();
+    @OneToMany(mappedBy = "chat", fetch = FetchType.LAZY, cascade = CascadeType.PERSIST, orphanRemoval = true)
+    private List<ChatUser> chatUsers = new ArrayList<>();
 
-    public Chat(UUID id) {
-        this.id = id;
+    public static Chat createChat(List<ChatUser> chatUsers) {
+        Chat chat = new Chat();
+        chatUsers.forEach(chat::addChatUsers);
+        return chat;
     }
 
-    public void addChatter(User... receviers) {
-        users.addAll(Arrays.asList(receviers));
-    }
-
-    public void addChatter(List<User> receviers) {
-        users.addAll(receviers);
+    public void addChatUsers(ChatUser chatUser) {
+        this.chatUsers.add(chatUser);
+        chatUser.setChat(this);
     }
 
     public void checkContainsUser(final User receiver) {
-        if(this.users.stream().noneMatch(user -> user == receiver)) {
+        boolean exist = this.chatUsers.stream()
+                .map(ChatUser::getUser)
+                .anyMatch(user -> user.equals(receiver));
+        if(!exist) {
             throw new InvalidChatterException(ErrorCode.INVALID_CHATTER);
         }
     }

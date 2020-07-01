@@ -2,6 +2,7 @@ package com.kakao.task.sprinkle.receive;
 
 import com.kakao.task.sprinkle.domain.chat.Chat;
 import com.kakao.task.sprinkle.domain.chat.ChatRepository;
+import com.kakao.task.sprinkle.domain.chatUser.ChatUser;
 import com.kakao.task.sprinkle.domain.dividend.Dividend;
 import com.kakao.task.sprinkle.domain.dividend.dao.DividendRepository;
 import com.kakao.task.sprinkle.domain.sprinkle.exception.DuplicateReceiveException;
@@ -17,6 +18,9 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 
+import java.util.Arrays;
+import java.util.List;
+
 @DataJpaTest
 public class ReceiveTest {
 
@@ -29,40 +33,25 @@ public class ReceiveTest {
     @Autowired
     DividendRepository dividendRepository;
 
+    private static final int totalAmount = 1000;
+    private static final int divideCount = 3;
+
     User sprinkler;
     User receiver;
-    Chat chat1;
+    Chat chat;
     Sprinkle sprinkle;
 
     @BeforeEach
     public void setUp() {
-        sprinkler = userRepository.save(new User("yeob32"));
-        receiver = userRepository.save(new User("sykim"));
-        Chat chat = new Chat();
-        chat.addChatter(sprinkler, receiver);
-        chat1 = chatRepository.save(chat);
-        sprinkle = Sprinkle.builder()
-                .user(sprinkler)
-                .chat(chat1)
-                .amount(1000)
-                .divideCount(3)
-                .build();
-        sprinkle.createSprinkle();
-
-
+        setUpData();
     }
 
     @Test
     @DisplayName("배당금 받기")
     public void receive() {
-        Sprinkle saveSprinkle = sprinkleRepository.save(sprinkle);
-        Sprinkle findSprinkle = sprinkleRepository.findByToken(sprinkle.getToken());
-
-        saveSprinkle.receiveValidator(receiver);
-        Dividend usableDividend = findSprinkle.getDividends().stream().filter(Dividend::usable).findFirst().get();
-
-        User user = userRepository.findById(receiver.getId()).orElse(null);
-        usableDividend.allotMoney(user);
+        sprinkle.receiveValidator(receiver);
+        Dividend usableDividend = sprinkle.getDividends().stream().filter(Dividend::usable).findFirst().get();
+        usableDividend.allotMoney(receiver);
 
         Assertions.assertTrue(usableDividend.getAmount() > 0);
     }
@@ -70,39 +59,46 @@ public class ReceiveTest {
     @Test
     @DisplayName("배당금 받은 후 받기 완료 금액 확인")
     public void checkReceivedAmount() {
-        Sprinkle saveSprinkle = sprinkleRepository.save(sprinkle);
-        Sprinkle findSprinkle = sprinkleRepository.findByToken(sprinkle.getToken());
+        sprinkle.receiveValidator(receiver);
+        Dividend usableDividend = sprinkle.getDividends().stream().filter(Dividend::usable).findFirst().get();
+        usableDividend.allotMoney(receiver);
 
-        saveSprinkle.receiveValidator(receiver);
-        Dividend usableDividend = findSprinkle.getDividends().stream().filter(Dividend::usable).findFirst().get();
+        sprinkle.totalReceivedAmount(usableDividend);
 
-        User user = userRepository.findById(receiver.getId()).orElse(null);
-        usableDividend.allotMoney(user);
-        findSprinkle.totalReceivedAmount(usableDividend);
-
-        Assertions.assertTrue(findSprinkle.getAmount() > 0);
+        Assertions.assertTrue(sprinkle.getAmount() > 0);
     }
 
     @Test
     @DisplayName("내 배당금 내가 받기")
     public void receiveMyMoney() {
-        sprinkleRepository.save(sprinkle);
-        Sprinkle findSprinkle = sprinkleRepository.findByToken(sprinkle.getToken());
-
-        Assertions.assertThrows(VerifyReceiverException.class, () -> findSprinkle.receiveValidator(sprinkler));
+        Assertions.assertThrows(VerifyReceiverException.class, () -> sprinkle.receiveValidator(sprinkler));
     }
 
     @Test
     @DisplayName("배당금 두번 받기")
     public void duplicateRecevice() {
-        Sprinkle saveSprinkle = sprinkleRepository.save(sprinkle);
-        Sprinkle findSprinkle = sprinkleRepository.findByToken(saveSprinkle.getToken());
+        sprinkle.receiveValidator(receiver);
 
-        User findReceiver = userRepository.findById(receiver.getId()).orElse(null);
-        findSprinkle.receiveValidator(findReceiver);
+        Dividend usableDividend = sprinkle.getDividends().stream().filter(Dividend::usable).findFirst().get();
+        usableDividend.allotMoney(receiver);
 
-        Dividend usableDividend = findSprinkle.getDividends().stream().filter(Dividend::usable).findFirst().get();
-        usableDividend.allotMoney(findReceiver);
-        Assertions.assertThrows(DuplicateReceiveException.class, () -> findSprinkle.receiveValidator(findReceiver));
+        Assertions.assertThrows(DuplicateReceiveException.class, () -> sprinkle.receiveValidator(receiver));
+    }
+
+    private void setUpData() {
+        sprinkler = userRepository.save(new User("yeob32"));
+        receiver = userRepository.save(new User("sykim"));
+        List<ChatUser> chatUsers = ChatUser.createChatUsers(Arrays.asList(sprinkler, receiver));
+
+        chat = Chat.createChat(chatUsers);
+        chatRepository.save(chat);
+
+        sprinkle = Sprinkle.builder()
+                .user(sprinkler)
+                .chat(chat)
+                .amount(totalAmount)
+                .divideCount(divideCount)
+                .build();
+        sprinkleRepository.save(sprinkle);
     }
 }
