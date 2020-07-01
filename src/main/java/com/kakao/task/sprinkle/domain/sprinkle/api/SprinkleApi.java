@@ -4,14 +4,14 @@ import com.kakao.task.sprinkle.domain.sprinkle.application.ReceiveService;
 import com.kakao.task.sprinkle.domain.sprinkle.application.SprinkleService;
 import com.kakao.task.sprinkle.domain.sprinkle.dto.ReceiveDto;
 import com.kakao.task.sprinkle.domain.sprinkle.dto.SprinkleDto;
-import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.UUID;
 
 @RestController
-@AllArgsConstructor
+@RequiredArgsConstructor
 public class SprinkleApi {
 
     private final SprinkleService sprinkleService;

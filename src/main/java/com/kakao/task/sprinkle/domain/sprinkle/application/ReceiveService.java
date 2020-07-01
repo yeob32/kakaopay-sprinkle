@@ -11,11 +11,11 @@ import com.kakao.task.sprinkle.domain.sprinkle.exception.DataNotFoundException;
 import com.kakao.task.sprinkle.domain.user.User;
 import com.kakao.task.sprinkle.domain.user.UserRepository;
 import com.kakao.task.sprinkle.global.exception.ErrorCode;
-import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-@AllArgsConstructor
+@RequiredArgsConstructor
 @Service
 public class ReceiveService {
 
